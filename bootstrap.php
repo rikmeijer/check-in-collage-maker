@@ -21,9 +21,9 @@ return function (bool $renew = false) use ($cache_directory, $max_images) {
     is_dir($cache_directory) || mkdir($cache_directory);
 
     $yielded = 0;
-    if ($renew === false) {
-        $cached_files = glob($cache_directory . '/*.php');
-        foreach (array_rand($cached_files, $max_images) as $cache_file_index) {
+    $cached_files = glob($cache_directory . '/*.php');
+    if ($renew === false && count($cached_files) > 0) {
+        foreach (array_rand($cached_files, min($max_images, count($cached_files))) as $cache_file_index) {
             yield include $cached_files[$cache_file_index];
             $yielded++;
         }
