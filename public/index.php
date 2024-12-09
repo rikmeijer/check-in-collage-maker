@@ -1,6 +1,15 @@
 <?php
 $photos = require dirname(__DIR__) . '/bootstrap.php';
 
+if (isset($_GET['random'])) {
+    $photos = iterator_to_array($photos(false));
+    $photo = $photos[array_rand($photos, 1)];
+
+    header('content-type: image/jpeg');
+    print file_get_contents($photo["urls"]["thumb"]);
+    exit;
+}
+
 $columns = 6;
 ?>
  <!DOCTYPE html>
@@ -32,8 +41,8 @@ $columns = 6;
         if ($index % $columns === 0) {
             ?></p><p><?php
         }
-        ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" /><?php
-    }
+        ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" onclick="this.src='index.php?random&' + (new Date()).toString()" /><?php
+}
         ?></p>
 <p><a href="index.php?renew">New set</a></p>
 </body>
