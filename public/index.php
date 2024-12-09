@@ -1,14 +1,7 @@
 <?php
 
-require dirname(__DIR__) . '/bootstrap.php';
-$unsplash_client = Unsplash\HttpClient::init([
-    'applicationId' => $_SERVER['UNSPLASH_KEY'],
-    'secret' => $_SERVER['UNSPLASH_SECRET'],
-    'callbackUrl' => $_SERVER['UNSPLASH_CALLBACK_URL'],
-    'utmSource' => 'Check-in collage generator'
-        ]);
+$photos = require dirname(__DIR__) . '/bootstrap.php';
 
-$photos = Unsplash\Photo::random(['topics' => 'animals,food-drink,travel,architecture-interior,business-work', 'orientation' => 'landscape', 'count' => 30])->toArray();
 $columns = 6;
 ?>
  <!DOCTYPE html>
@@ -34,13 +27,13 @@ $columns = 6;
 
 <body>
 <p><?php
-foreach ($photos as $index => $photo) {
+    foreach ($photos() as $index => $photo) {
         if ($index % $columns === 0) {
             ?></p><p><?php
         }
         ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" /><?php
-}
-    ?></p>
+    }
+        ?></p>
 </body>
 
 </html><?php
