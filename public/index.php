@@ -1,18 +1,8 @@
 <?php
-$unsplash_factory = require dirname(__DIR__) . '/bootstrap.php';
-$unsplash = $unsplash_factory(
+$unsplash = (require dirname(__DIR__) . '/bootstrap.php')(
         skip_cache: isset($_GET['renew']) || isset($_POST['topic']),
-        topics: $_POST['topic'] ?? ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work']
+        topics: $_POST['topic'] ?? null
 );
-
-if (isset($_GET['random'])) {
-    $unsplash = iterator_to_array($unsplash(false));
-    $photo = $unsplash[array_rand($unsplash, 1)];
-
-    header('content-type: image/jpeg');
-    print file_get_contents($photo["urls"]["thumb"]);
-    exit;
-}
 
 $columns = 6;
 ?>
@@ -52,7 +42,7 @@ $columns = 6;
         if ($index % $columns === 0) {
             ?></p><p><?php
         }
-        ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" onclick="this.src='index.php?random&' + (new Date()).toString()" /><?php
+        ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" onclick="this.src='random.php?' + (new Date()).toString()" /><?php
 }
         ?></p>
 <p><a href="index.php">Random cached set</a>&nbsp;&bull;&nbsp;<a href="index.php?renew">Random new set</a></p>

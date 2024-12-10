@@ -15,8 +15,10 @@ Unsplash\HttpClient::init([
 ]);
 
 $defaults = [
+    'skip_cache' => false,
+    'topics' => ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work'],
     'cache_directory' => __DIR__ . '/cache',
     'max_images' => 30
 ];
 
-return fn(...$args): rikmeijer\CheckInCollageMaker\Unsplash => new rikmeijer\CheckInCollageMaker\Unsplash(...array_merge($defaults, $args));
+return fn(...$args): rikmeijer\CheckInCollageMaker\Unsplash => new rikmeijer\CheckInCollageMaker\Unsplash(...array_merge($defaults, array_filter($args, fn($value) => isset($value))));
