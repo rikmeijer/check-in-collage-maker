@@ -1,11 +1,13 @@
 <?php
-$photos = require dirname(__DIR__) . '/bootstrap.php';
-$topics = @Unsplash\Topic::all(per_page: 50, order_by: 'featured')->toArray();
-usort($topics, fn(array $topic_a, array $topic_b) => strcasecmp($topic_a['title'], $topic_b['title']));
+$unsplash_factory = require dirname(__DIR__) . '/bootstrap.php';
+$unsplash = $unsplash_factory(
+        skip_cache: isset($_GET['renew']) || isset($_POST['topic']),
+        topics: $_POST['topic'] ?? ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work']
+);
 
 if (isset($_GET['random'])) {
-    $photos = iterator_to_array($photos(false));
-    $photo = $photos[array_rand($photos, 1)];
+    $unsplash = iterator_to_array($unsplash(false));
+    $photo = $unsplash[array_rand($unsplash, 1)];
 
     header('content-type: image/jpeg');
     print file_get_contents($photo["urls"]["thumb"]);
@@ -46,21 +48,21 @@ $columns = 6;
 
 <body>
 <p><?php
-    foreach ($photos(isset($_GET['renew']) || isset($_POST['topic']), $_POST['topic'] ?? ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work']) as $index => $photo) {
+    foreach ($unsplash() as $index => $photo) {
         if ($index % $columns === 0) {
             ?></p><p><?php
         }
         ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" onclick="this.src='index.php?random&' + (new Date()).toString()" /><?php
 }
         ?></p>
-<p><a href="index.php?renew">Random new set</a></p>
+<p><a href="index.php">Random cached set</a>&nbsp;&bull;&nbsp;<a href="index.php?renew">Random new set</a></p>
 <p><form method="post">
-    <p><label for="topic_featured">Featured</label><br /><select multiple="multiple" id="topic_featured" name="topic[]">
-            <?php foreach ($topics as $collection): ?>
-                <option value="<?= htmlentities($collection['id']); ?>"><?= htmlentities($collection['title']); ?></option>
+    <p><label for="topic_featured">Topics</label><br /><select multiple="multiple" id="topic_featured" name="topic[]">
+            <?php foreach ($unsplash->available_topics() as $id => $topic): ?>
+            <option value="<?= htmlentities($id); ?>"<?= ($topic['selected'] ? ' selected' : ''); ?>><?= htmlentities($topic['title']); ?></option>
             <?php endforeach; ?>
         </select></p>
-    <p><input type="submit" value="Random set with topic(s)"></p>
+        <p><input type="submit" value="Random set with topic(s)" /><input type="reset" value="Clear" /></p>
 </form>
 </p>
 </body>

@@ -9,7 +9,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Rikmeijer\\CheckInCollageMaker\\": "src/"
+            "rikmeijer\\CheckInCollageMaker\\": "src/"
         }
     },
     "authors": [
