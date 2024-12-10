@@ -28,7 +28,6 @@ readonly class Unsplash {
     }
 
     public function __invoke() {
-
         $yielded = 0;
         $cached_files = glob($this->cache_directory . '/*.php');
         if ($this->skip_cache === false && count($cached_files) > 0) {
