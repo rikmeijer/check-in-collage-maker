@@ -10,7 +10,8 @@ $dotenv->load();
 $cache_directory = __DIR__ . '/cache';
 $max_images = 30;
 
-return function (bool $renew = false) use ($cache_directory, $max_images) {
+return function (bool $renew, array $topic) use ($cache_directory, $max_images) {
+
     Unsplash\HttpClient::init([
         'applicationId' => $_SERVER['UNSPLASH_KEY'],
         'secret' => $_SERVER['UNSPLASH_SECRET'],
@@ -32,7 +33,7 @@ return function (bool $renew = false) use ($cache_directory, $max_images) {
         }
     }
 
-    $photos = Unsplash\Photo::random(['topics' => 'animals,food-drink,travel,architecture-interior,business-work', 'orientation' => 'landscape', 'count' => $max_images - $yielded])->toArray();
+    $photos = Unsplash\Photo::random(['topics' => implode(',', $topic), 'orientation' => 'landscape', 'count' => $max_images - $yielded])->toArray();
     foreach ($photos as $photo) {
         file_put_contents($cache_directory . '/' . $photo['id'] . '.php', '<?php return ' . var_export($photo, true) . ';');
         yield $photo;

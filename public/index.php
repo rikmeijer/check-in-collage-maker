@@ -21,10 +21,13 @@ $columns = 6;
         background-color: #fff;
         font-family: monospace, sans-serif;
     }
-    p {
+    body > p, form, footer {
         margin:0 auto;
         width: 1200px;
         text-align: center;
+    }
+    footer {
+        font-size: 0.8em;
     }
     img {
         vertical-align:middle;
@@ -37,14 +40,23 @@ $columns = 6;
 
 <body>
 <p><?php
-    foreach ($photos(isset($_GET['renew'])) as $index => $photo) {
+    foreach ($photos(isset($_GET['renew']), $_POST['topic'] ?? ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work']) as $index => $photo) {
         if ($index % $columns === 0) {
             ?></p><p><?php
         }
         ?><img src="<?= htmlentities($photo["urls"]["thumb"]); ?>" onclick="this.src='index.php?random&' + (new Date()).toString()" /><?php
 }
         ?></p>
-<p><a href="index.php?renew">New set</a></p>
+<p><a href="index.php?renew">Random new set</a></p>
+<p><form method="post">
+    <p><select multiple="multiple" name="topic[]">
+            <?php foreach (@Unsplash\Topic::all()->toArray() as $collection): ?>
+            <option value="<?= htmlentities($collection['id']); ?>"><?= htmlentities($collection['title']); ?></option>
+        <?php endforeach; ?>
+        </select></p>
+    <p><input type="submit" value="Random set with topic(s)"></p>
+</form>
+</p>
 </body>
-
-</html><?php
+<footer><a href="https://www.paypal.com/donate/?hosted_button_id=B3WRGUUNZVDCL">Donate via PayPal</a></footer>
+ </html><?php
