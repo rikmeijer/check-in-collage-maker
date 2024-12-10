@@ -1,5 +1,7 @@
 <?php
 $photos = require dirname(__DIR__) . '/bootstrap.php';
+$topics = @Unsplash\Topic::all(per_page: 50, order_by: 'featured')->toArray();
+usort($topics, fn(array $topic_a, array $topic_b) => strcasecmp($topic_a['title'], $topic_b['title']));
 
 if (isset($_GET['random'])) {
     $photos = iterator_to_array($photos(false));
@@ -35,12 +37,16 @@ $columns = 6;
         height: 150px;
         object-fit: cover;
     }
+    select {
+        width: 400px;
+        height: 200px;
+    }
 </style>
 </head>
 
 <body>
 <p><?php
-    foreach ($photos(isset($_GET['renew']), $_POST['topic'] ?? ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work']) as $index => $photo) {
+    foreach ($photos(isset($_GET['renew']) || isset($_POST['topic']), $_POST['topic'] ?? ['animals', 'food-drink', 'travel', 'architecture-interior', 'business-work']) as $index => $photo) {
         if ($index % $columns === 0) {
             ?></p><p><?php
         }
@@ -49,10 +55,10 @@ $columns = 6;
         ?></p>
 <p><a href="index.php?renew">Random new set</a></p>
 <p><form method="post">
-    <p><select multiple="multiple" name="topic[]">
-            <?php foreach (@Unsplash\Topic::all()->toArray() as $collection): ?>
-            <option value="<?= htmlentities($collection['id']); ?>"><?= htmlentities($collection['title']); ?></option>
-        <?php endforeach; ?>
+    <p><label for="topic_featured">Featured</label><br /><select multiple="multiple" id="topic_featured" name="topic[]">
+            <?php foreach ($topics as $collection): ?>
+                <option value="<?= htmlentities($collection['id']); ?>"><?= htmlentities($collection['title']); ?></option>
+            <?php endforeach; ?>
         </select></p>
     <p><input type="submit" value="Random set with topic(s)"></p>
 </form>
